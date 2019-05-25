@@ -15,7 +15,9 @@
      <% 
      %>
         <% 
-            String citta = request.getParameter("citta");
+            String id = request.getParameter("list");
+            String dataI = request.getParameter("dataI");
+            String dataF = request.getParameter("dataF");
         
             String connectionUrl = "jdbc:sqlserver://213.140.22.237\\SQLEXPRESS:1433;databaseName=XFactor;user=bellati.samuele;password=xxx123#";
 
@@ -24,30 +26,22 @@
             Connection connection = DriverManager.getConnection(connectionUrl);
 			
 			//preparedStatement
-			String sql = "SELECT * FROM Appartamento WHERE citta = ? ORDER BY prezzoPerNotte DESC ";
+			String sql = "SELECT COUNT(IDAppartamento) AS cont FROM Affitto WHERE IDAppartamento = ? AND ((dataCheckIn <= ?) AND (dataCheckOut >= ?))";
 			PreparedStatement pstmt = connection.prepareStatement(sql);
 			
-			pstmt.setString(1, citta);
+			pstmt.setString(1, id);
+			pstmt.setString(2, dataF);
+			pstmt.setString(3, dataI);
+			
 			ResultSet rs = pstmt.executeQuery();
 	            
-	            
-	         %>
-	        <form method="post" action="/jsp/EsercizioC31.jsp" name="myform" id="myform">
-	        <input type='submit' value='Invia'/>
-	        </form>
-            <%
-            
-	      
-	            out.println("<select name='list' form='myform'>");
-    	            while(rs.next()){
-    	                out.println("<option value='" + rs.getString("ID") + "'>nome: "+ rs.getString("nome") + " - prezzo per notte: " + rs.getString("prezzoPerNotte") + "</option>");
-                    }
-                out.println("</select><br>");
-                
-                out.println("<input type='date' name='dataI' required/><br>");
-                out.println("<input type='date' name='dataF' required/><br>");
-	          
-	           
+	        rs.next();
+	        
+	        if(rs.getInt("cont") == 0){
+	            out.println("libero");
+	           }else{
+	              out.println("occupato"); 
+	           }
 	        connection.close();
         %>
     </body>
